@@ -6,12 +6,14 @@ import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 
 class MazeManager {
 
-    val maze = MazeImpl.generate(
-        width = 7,
-        height = 7,
-        generator = DiggingGenerator(),
-        decorator = StandardOutputDecorator(sequentialOutput = true),
-    )
-    maze.setup()
-    maze.buildMap()
+    fun main() {
+        val maze = MazeImpl.generate(
+            width = 7,
+            height = 7,
+            generator = DiggingGenerator(),
+            decorator = StandardOutputDecorator(sequentialOutput = true),
+        )
+        maze.setup()
+        maze.buildMap()
+    }
 }
