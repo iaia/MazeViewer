@@ -1,12 +1,28 @@
 package dev.iaiabot.maze.viewer.android
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainViewModel,
+) {
+    val procedures by viewModel.procedures.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.start()
+    }
+
     MaterialTheme {
-        Text(text = "hello")
+
+        Column {
+            procedures.forEach { procedure ->
+                Text(text = procedure)
+            }
+        }
     }
 }

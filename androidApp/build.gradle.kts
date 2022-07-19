@@ -5,6 +5,7 @@ plugins {
 
 android {
     compileSdk = 31
+
     defaultConfig {
         applicationId = "dev.iaiabot.maze.viewer.android"
         minSdk = 26
@@ -12,10 +13,23 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
         }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
 }
 
