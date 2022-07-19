@@ -34,7 +34,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
     implementation("androidx.compose.runtime:runtime-rxjava2:1.1.1")
-    implementation("dev.iaiabot.maze:mazeGenerator:1.0")
+    implementation("dev.iaiabot.maze:mazeEntity:3.0")
+    implementation("dev.iaiabot.maze:mazeGenerator:3.0")
 
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 }
