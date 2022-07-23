@@ -44,7 +44,7 @@ class MainViewModel: ViewModel() {
         selectedGenerator.tryEmit(generator)
         val mazeWidthHeight = decideMazeWidthHeight(screenWidthDp, screenHeightDp)
         this.mazeWidthHeight.tryEmit(mazeWidthHeight)
-        val maze = MazeImpl.generate(
+        val maze = MazeImpl(
             width = mazeWidthHeight.first,
             height = mazeWidthHeight.second,
             generator = generator,
@@ -55,8 +55,8 @@ class MainViewModel: ViewModel() {
     }
 
     private fun decideMazeWidthHeight(screenWidthDp: Int, screenHeightDp: Int): Pair<Int, Int> {
-        val mazeWidth = (screenWidthDp - 20) / 48
-        val mazeHeight = (screenHeightDp - 320) / 48
+        val mazeWidth = (screenWidthDp - 20) / 48 // TODO: compose側で計算する
+        val mazeHeight = (screenHeightDp - 40) / 48
 
         return Pair(
             if (mazeWidth % 2 == 0) {

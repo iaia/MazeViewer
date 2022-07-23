@@ -15,9 +15,6 @@ class TextComposeDecorator(
 ): Decorator {
     val procedures = MutableStateFlow<Cell?>(null)
 
-    override fun fullOutput(cells: Array<Array<Cell?>>) {
-    }
-
     override fun sequentialOutput(cell: Cell) {
         procedures.tryEmit(cell)
     }

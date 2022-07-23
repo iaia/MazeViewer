@@ -71,7 +71,8 @@ private fun MazeCompose(width: Int, height: Int, cells: Map<XY, Cell?>) {
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         displayCells.forEach { column ->
             Row {
