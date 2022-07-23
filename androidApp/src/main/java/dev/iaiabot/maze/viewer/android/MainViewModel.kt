@@ -30,11 +30,11 @@ class MainViewModel: ViewModel() {
                     if (cell == null) {
                         return@collect
                     }
-                    val cells = cells.value.toTypedArray()
-                    cells[cell.y] = cells[cell.y].toTypedArray().also {
+                    val cells = cells.value.toMutableList()
+                    cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
-                    }.toList()
-                    this@MainViewModel.cells.emit(cells.toList())
+                    }
+                    this@MainViewModel.cells.emit(cells)
                 }
         }
     }
