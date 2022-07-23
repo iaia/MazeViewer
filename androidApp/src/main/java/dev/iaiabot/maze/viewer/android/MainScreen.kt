@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import dev.iaiabot.maze.entity.Cell
@@ -23,11 +24,15 @@ import kotlinx.coroutines.flow.asStateFlow
 fun MainScreen(
     viewModel: MainViewModel,
 ) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+
     val cells by viewModel.procedures.collectAsState()
     val generator by viewModel.selectedGenerator.collectAsState()
+    val mazeWidthHeight by viewModel.mazeWidthHeight.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.start()
+        viewModel.start(screenWidth, screenHeight)
     }
 
     BoxWithConstraints(
@@ -42,14 +47,14 @@ fun MainScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { viewModel.start() }) {
+                Button(onClick = { viewModel.start(screenWidth, screenHeight) }) {
                     Text(text = "Regenerate")
 
                 }
                 Text(text = generator?.javaClass?.simpleName.toString())
             }
 
-            MazeCompose(width = viewModel.mazeWidth, height = viewModel.mazeHeight, cells = cells)
+            MazeCompose(width = mazeWidthHeight.first, height = mazeWidthHeight.second, cells = cells)
         }
     }
 }

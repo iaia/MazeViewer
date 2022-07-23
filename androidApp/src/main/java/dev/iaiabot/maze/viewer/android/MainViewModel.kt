@@ -10,14 +10,11 @@ import dev.iaiabot.maze.mazegenerator.model.MazeImpl
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
-    val mazeWidth = 9
-    val mazeHeight = 9
+    val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
     val procedures = MutableStateFlow<Map<XY, Cell?>>(mapOf())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
@@ -42,16 +39,36 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun start() {
+    fun start(screenWidthDp: Int, screenHeightDp: Int) {
         val generator = generators.random()
         selectedGenerator.tryEmit(generator)
+        val mazeWidthHeight = decideMazeWidthHeight(screenWidthDp, screenHeightDp)
+        this.mazeWidthHeight.tryEmit(mazeWidthHeight)
         val maze = MazeImpl.generate(
-            width = mazeWidth,
-            height = mazeHeight,
+            width = mazeWidthHeight.first,
+            height = mazeWidthHeight.second,
             generator = generator,
             decorator = decorator,
         )
         maze.setup()
         maze.buildMap()
+    }
+
+    private fun decideMazeWidthHeight(screenWidthDp: Int, screenHeightDp: Int): Pair<Int, Int> {
+        val mazeWidth = (screenWidthDp - 20) / 48
+        val mazeHeight = (screenHeightDp - 320) / 48
+
+        return Pair(
+            if (mazeWidth % 2 == 0) {
+                mazeWidth - 1
+            } else {
+                mazeWidth
+            },
+            if (mazeHeight % 2 == 0) {
+                mazeHeight - 1
+            } else {
+                mazeHeight
+            }
+        )
     }
 }
