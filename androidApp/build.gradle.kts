@@ -51,8 +51,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
     implementation("androidx.compose.runtime:runtime-rxjava2:1.1.1")
-    implementation("dev.iaiabot.maze:mazeEntity:4.0")
-    implementation("dev.iaiabot.maze:mazeGenerator:4.0")
+
+    val maze_version = "5.0"
+    implementation("dev.iaiabot.maze:mazeEntity:$maze_version")
+    implementation("dev.iaiabot.maze:mazeGenerator:${maze_version}")
+    implementation("dev.iaiabot.maze:mazeResolver:${maze_version}")
 
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 }

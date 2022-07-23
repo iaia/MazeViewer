@@ -3,11 +3,13 @@ package dev.iaiabot.maze.viewer.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.iaiabot.maze.entity.Cell
-import dev.iaiabot.maze.mazegenerator.Generator
-import dev.iaiabot.maze.mazegenerator.model.MazeImpl
+import dev.iaiabot.maze.entity.Generator
+import dev.iaiabot.maze.entity.Maze
+import dev.iaiabot.maze.entity.Player
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
+import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
@@ -23,6 +25,9 @@ class MainViewModel: ViewModel() {
         DiggingGenerator(),
         LayPillarGenerator(),
         WallExtendGenerator(),
+    )
+    private val resolvers = listOf(
+        RightHandResolver(),
     )
 
     init {
@@ -53,7 +58,7 @@ class MainViewModel: ViewModel() {
                 List(mazeWidthHeight.first) { null }
             }
         )
-        val maze = MazeImpl(
+        val maze = Maze(
             width = mazeWidthHeight.first,
             height = mazeWidthHeight.second,
             generator = generator,
@@ -61,6 +66,10 @@ class MainViewModel: ViewModel() {
         )
         maze.setup()
         maze.buildMap()
+
+        val resolver = resolvers.random()
+        val player = Player(maze, resolver, decorator)
+        player.start()
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {
