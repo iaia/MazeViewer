@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -22,6 +24,7 @@ fun MainScreen(
     viewModel: MainViewModel,
 ) {
     val cells by viewModel.procedures.collectAsState()
+    val generator by viewModel.selectedGenerator.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.start()
@@ -30,9 +33,24 @@ fun MainScreen(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Cyan)
+            .padding(8.dp)
     ) {
-        MazeCompose(width = viewModel.mazeWidth, height = viewModel.mazeHeight, cells = cells)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { viewModel.start() }) {
+                    Text(text = "Regenerate")
+
+                }
+                Text(text = generator?.javaClass?.simpleName.toString())
+            }
+
+            MazeCompose(width = viewModel.mazeWidth, height = viewModel.mazeHeight, cells = cells)
+        }
     }
 }
 
@@ -72,7 +90,8 @@ private fun Cell(cell: Cell?) {
             .background(
                 color = when (cell) {
                     is Cell.Wall -> Color.Black
-                    is Cell.Start, is Cell.Goal, is Cell.Floor -> Color.Green
+                    is Cell.Start, is Cell.Goal -> Color.Red
+                    is Cell.Floor -> Color.Green
                     null -> Color.DarkGray
                 }
             )
