@@ -1,10 +1,8 @@
 package dev.iaiabot.maze.viewer.android
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.iaiabot.maze.entity.Cell
-import dev.iaiabot.maze.entity.XY
 import dev.iaiabot.maze.mazegenerator.Generator
 import dev.iaiabot.maze.mazegenerator.model.MazeImpl
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
@@ -15,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
     val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
-    val procedures = MutableStateFlow<Map<XY, Cell?>>(mapOf())
+    val cells = MutableStateFlow<List<List<Cell?>>>(emptyList())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
     private val decorator = TextComposeDecorator()
@@ -32,18 +30,25 @@ class MainViewModel: ViewModel() {
                     if (cell == null) {
                         return@collect
                     }
-                    val cells = procedures.value.toMutableMap()
-                    cells[cell.xy] = cell
-                    procedures.emit(cells)
+                    val cells = cells.value.toTypedArray()
+                    cells[cell.y] = cells[cell.y].toTypedArray().also {
+                        it[cell.x] = cell
+                    }.toList()
+                    this@MainViewModel.cells.emit(cells.toList())
                 }
         }
     }
 
-    fun start(screenWidthDp: Int, screenHeightDp: Int) {
+    fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
         val generator = generators.random()
         selectedGenerator.tryEmit(generator)
-        val mazeWidthHeight = decideMazeWidthHeight(screenWidthDp, screenHeightDp)
+        val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         this.mazeWidthHeight.tryEmit(mazeWidthHeight)
+        this.cells.tryEmit(
+            List(mazeWidthHeight.second) {
+                List(mazeWidthHeight.first) { null }
+            }
+        )
         val maze = MazeImpl(
             width = mazeWidthHeight.first,
             height = mazeWidthHeight.second,
@@ -54,10 +59,7 @@ class MainViewModel: ViewModel() {
         maze.buildMap()
     }
 
-    private fun decideMazeWidthHeight(screenWidthDp: Int, screenHeightDp: Int): Pair<Int, Int> {
-        val mazeWidth = (screenWidthDp - 20) / 48 // TODO: compose側で計算する
-        val mazeHeight = (screenHeightDp - 40) / 48
-
+    private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {
         return Pair(
             if (mazeWidth % 2 == 0) {
                 mazeWidth - 1
