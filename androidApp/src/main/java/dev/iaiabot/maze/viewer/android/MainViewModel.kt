@@ -2,10 +2,7 @@ package dev.iaiabot.maze.viewer.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.iaiabot.maze.entity.Cell
-import dev.iaiabot.maze.entity.Generator
-import dev.iaiabot.maze.entity.Maze
-import dev.iaiabot.maze.entity.Player
+import dev.iaiabot.maze.entity.*
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
@@ -34,15 +31,16 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             decorator.procedures
                 .buffer(capacity = 1000000)
-                .collect { cell ->
-                    if (cell == null) {
-                        return@collect
-                    }
+                .collect { procedure ->
+                    val cell = procedure.first ?: return@collect
                     val cells = cells.value.toMutableList()
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
-                    delay(1)
+                    when (procedure.second) {
+                        Status.SETUP -> { }
+                        else -> delay(1)
+                    }
                     this@MainViewModel.cells.emit(cells)
                 }
         }
