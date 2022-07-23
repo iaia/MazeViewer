@@ -90,7 +90,7 @@ private fun Cell(
                     is Cell.Wall -> Color.Black
                     is Cell.Start, is Cell.Goal -> Color.Red
                     is Cell.Floor -> Color.Green
-                    null -> Color.DarkGray
+                    null -> Color.LightGray
                 }
             )
     )
