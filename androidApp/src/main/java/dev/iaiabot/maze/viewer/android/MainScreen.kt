@@ -81,9 +81,6 @@ private fun Cell(
     cell: Cell?,
     cellSize: Dp,
 ) {
-    if (cell == null) {
-        return
-    }
     Box(
         modifier = Modifier
             .size(cellSize)

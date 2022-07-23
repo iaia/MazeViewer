@@ -8,7 +8,9 @@ import dev.iaiabot.maze.mazegenerator.model.MazeImpl
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
@@ -26,6 +28,7 @@ class MainViewModel: ViewModel() {
     init {
         viewModelScope.launch {
             decorator.procedures
+                .buffer(capacity = 1000000)
                 .collect { cell ->
                     if (cell == null) {
                         return@collect
@@ -34,6 +37,7 @@ class MainViewModel: ViewModel() {
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
+                    delay(1)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
