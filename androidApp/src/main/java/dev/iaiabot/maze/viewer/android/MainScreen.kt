@@ -43,9 +43,10 @@ fun MainScreen(
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Button(onClick = { viewModel.start(screenWidth, screenHeight) }) {
                     Text(text = "Regenerate")
