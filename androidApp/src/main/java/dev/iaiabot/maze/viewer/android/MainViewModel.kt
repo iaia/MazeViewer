@@ -18,6 +18,7 @@ class MainViewModel: ViewModel() {
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
     private val decorator = TextComposeDecorator()
+    private lateinit var player: Player
     private val generators = listOf(
         DiggingGenerator(),
         LayPillarGenerator(),
@@ -48,6 +49,7 @@ class MainViewModel: ViewModel() {
 
     fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
         val generator = generators.random()
+        val resolver = resolvers.random()
         selectedGenerator.tryEmit(generator)
         val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         this.mazeWidthHeight.tryEmit(mazeWidthHeight)
@@ -62,11 +64,9 @@ class MainViewModel: ViewModel() {
             generator = generator,
             decorator = decorator,
         )
+        player = Player(maze, resolver, decorator)
         maze.setup()
         maze.buildMap()
-
-        val resolver = resolvers.random()
-        val player = Player(maze, resolver, decorator)
         player.start()
     }
 
