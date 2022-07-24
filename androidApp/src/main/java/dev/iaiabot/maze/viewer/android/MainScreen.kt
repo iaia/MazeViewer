@@ -20,7 +20,7 @@ import dev.iaiabot.maze.entity.Cell
 fun MainScreen(
     viewModel: MainViewModel,
 ) {
-    val cellSize = 22
+    val cellSize = 18
 
     val requireMazeWidth = (LocalConfiguration.current.screenWidthDp - 4) / cellSize
     val requireMazeHeight = (LocalConfiguration.current.screenHeightDp - (4 + 48)) / cellSize
@@ -98,7 +98,13 @@ private fun Cell(
                         } else {
                             val alpha = (256 - (cell.stepped * 64)) / 256F
 
-                            Color.Blue.copy(alpha = if (alpha < 0) { 0F } else { alpha })
+                            Color.Blue.copy(
+                                alpha = if (alpha < 0) {
+                                    0F
+                                } else {
+                                    alpha
+                                }
+                            )
                         }
                     }
                     null -> Color.LightGray

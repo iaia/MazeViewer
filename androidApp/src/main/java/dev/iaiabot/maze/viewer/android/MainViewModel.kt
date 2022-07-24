@@ -2,21 +2,25 @@ package dev.iaiabot.maze.viewer.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.iaiabot.maze.entity.*
+import dev.iaiabot.maze.entity.Cell
+import dev.iaiabot.maze.entity.Generator
+import dev.iaiabot.maze.entity.Maze
+import dev.iaiabot.maze.entity.Player
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
-    val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
     val cells = MutableStateFlow<List<List<Cell?>>>(emptyList())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
+    private val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
     private val decorator = TextComposeDecorator()
     private lateinit var player: Player
     private val generators = listOf(
@@ -31,17 +35,15 @@ class MainViewModel: ViewModel() {
     init {
         viewModelScope.launch {
             decorator.procedures
-                .buffer(capacity = 1000000)
+                .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
                     val cell = procedure.first ?: return@collect
+                    delay(1)
                     val cells = cells.value.toMutableList()
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
-                    when (procedure.second) {
-                        Status.SETUP -> { }
-                        else -> delay(1)
-                    }
+                    delay(1)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
@@ -64,9 +66,9 @@ class MainViewModel: ViewModel() {
             generator = generator,
             decorator = decorator,
         )
-        player = Player(maze, resolver, decorator)
         maze.setup()
         maze.buildMap()
+        player = Player(maze, resolver, decorator)
         player.start()
     }
 

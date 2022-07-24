@@ -10,11 +10,6 @@ class TextComposeDecorator(
     val procedures = MutableStateFlow<Pair<Cell?, Status>>(Pair(null, Status.INIT))
 
     override fun sequentialOutput(cell: Cell, status: Status) {
-        procedures.tryEmit(
-            Pair(
-                cell,
-                status
-            )
-        )
+        procedures.tryEmit(Pair(cell, status))
     }
 }
