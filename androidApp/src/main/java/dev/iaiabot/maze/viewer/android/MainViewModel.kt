@@ -11,6 +11,7 @@ import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ class MainViewModel: ViewModel() {
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
+                    delay(1)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
@@ -67,7 +69,7 @@ class MainViewModel: ViewModel() {
         maze.setup()
         maze.buildMap()
         player = Player(maze, resolver, decorator)
-        player.start()
+        //player.start()
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {

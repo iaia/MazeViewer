@@ -1,8 +1,8 @@
 package dev.iaiabot.maze.viewer.android
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +23,7 @@ fun MainScreen(
     val cellSize = 18
 
     val requireMazeWidth = (LocalConfiguration.current.screenWidthDp - 4) / cellSize
-    val requireMazeHeight = (LocalConfiguration.current.screenHeightDp - (4 + 48)) / cellSize
+    val requireMazeHeight = (LocalConfiguration.current.screenHeightDp - (4 + 18)) / cellSize
 
     val cells by viewModel.cells.collectAsState()
     val generator by viewModel.selectedGenerator.collectAsState()
@@ -34,6 +34,7 @@ fun MainScreen(
 
     BoxWithConstraints(
         modifier = Modifier
+            .clickable { viewModel.start(requireMazeWidth, requireMazeHeight) }
             .fillMaxSize()
             .padding(2.dp)
     ) {
@@ -45,10 +46,6 @@ fun MainScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Button(onClick = { viewModel.start(requireMazeWidth, requireMazeHeight) }) {
-                    Text(text = "Regenerate")
-
-                }
                 Text(text = generator?.javaClass?.simpleName.toString())
             }
 
