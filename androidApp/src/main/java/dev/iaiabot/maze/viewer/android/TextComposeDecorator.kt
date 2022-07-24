@@ -7,9 +7,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class TextComposeDecorator(
 ): Decorator {
-    val procedures = MutableStateFlow<Pair<Cell?, Status>>(Pair(null, Status.INIT))
+    val procedures = MutableStateFlow<Cell?>(null)
 
-    override fun sequentialOutput(cell: Cell, status: Status) {
-        procedures.tryEmit(Pair(cell, status))
+    private var status: Status = Status.INIT
+
+    override fun sequentialOutput(cell: Cell) {
+        procedures.tryEmit(cell)
+    }
+
+    override fun onChangeStatus(status: Status) {
+        this.status = status
     }
 }

@@ -11,17 +11,17 @@ import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainViewModel: ViewModel() {
     val cells = MutableStateFlow<List<List<Cell?>>>(emptyList())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
     private val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
-    private val decorator = TextComposeDecorator()
+    private val decorator: TextComposeDecorator = TextComposeDecorator()
     private lateinit var player: Player
     private val generators = listOf(
         DiggingGenerator(),
@@ -37,21 +37,19 @@ class MainViewModel: ViewModel() {
             decorator.procedures
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
-                    val cell = procedure.first ?: return@collect
-                    delay(1)
+                    val cell = procedure ?: return@collect
                     val cells = cells.value.toMutableList()
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
-                    delay(1)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
     }
 
     fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
-        val generator = generators.random()
-        val resolver = resolvers.random()
+        val generator = generators.random(Random(System.currentTimeMillis()))
+        val resolver = resolvers.random(Random(System.currentTimeMillis()))
         selectedGenerator.tryEmit(generator)
         val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         this.mazeWidthHeight.tryEmit(mazeWidthHeight)
