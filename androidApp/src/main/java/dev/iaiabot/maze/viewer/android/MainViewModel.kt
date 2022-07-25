@@ -77,7 +77,7 @@ class MainViewModel: ViewModel() {
                 generator = generator,
             )
             maze.buildMap()
-            // player.start()
+            player.start()
             delay(10000)
         }
     }

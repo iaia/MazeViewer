@@ -64,7 +64,7 @@ private fun MazeCompose(
         cells.forEach { column ->
             Row {
                 column.forEach { cell ->
-                    key(cell?.x, cell?.y, cell?.stepped, cell?.javaClass) {
+                    key(cell?.x, cell?.y, cell?.javaClass) {
                         Cell(cell, cellSize)
                     }
                 }
@@ -87,9 +87,8 @@ private fun Cell(
                     is Cell.Wall -> Color.Black
                     is Cell.Start, is Cell.Goal -> Color.Red
                     is Cell.Floor -> {
-                        if (cell.stepped == 0) {
-                            Color.Green
-                        } else {
+                        Color.Green
+                        /*
                             val alpha = (256 - (cell.stepped * 64)) / 256F
 
                             Color.Blue.copy(
@@ -99,7 +98,7 @@ private fun Cell(
                                     alpha
                                 }
                             )
-                        }
+                         */
                     }
                     null -> Color.LightGray
                 }

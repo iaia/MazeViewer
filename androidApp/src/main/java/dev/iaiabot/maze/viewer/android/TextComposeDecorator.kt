@@ -15,6 +15,7 @@ class TextComposeDecorator(
     override fun sequentialOutput(cell: Cell) {
         when (status) {
             Status.BUILDING -> procedures.tryEmit(cell)
+            Status.RESOLVING -> procedures.tryEmit(cell)
             else -> {}
         }
     }
