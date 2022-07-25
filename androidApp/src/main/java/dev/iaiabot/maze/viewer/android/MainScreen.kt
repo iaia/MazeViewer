@@ -1,7 +1,6 @@
 package dev.iaiabot.maze.viewer.android
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -31,7 +30,6 @@ fun MainScreen(
 
     BoxWithConstraints(
         modifier = Modifier
-            .clickable { viewModel.start(requireMazeWidth, requireMazeHeight) }
             .fillMaxSize()
             .padding(2.dp)
     ) {

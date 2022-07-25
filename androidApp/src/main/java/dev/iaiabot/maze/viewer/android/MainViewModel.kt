@@ -7,8 +7,6 @@ import dev.iaiabot.maze.entity.Generator
 import dev.iaiabot.maze.entity.Maze
 import dev.iaiabot.maze.entity.Player
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
-import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
-import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -21,17 +19,22 @@ class MainViewModel: ViewModel() {
     val cells = MutableStateFlow<List<List<Cell?>>>(emptyList())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
-    private val mazeWidthHeight = MutableStateFlow(Pair(5, 5))
-    private val decorator: TextComposeDecorator = TextComposeDecorator()
-    private lateinit var player: Player
     private val generators = listOf(
-        DiggingGenerator(),
-        LayPillarGenerator(),
-        WallExtendGenerator(),
+        DiggingGenerator(priority = DiggingGenerator.Priority.DEPTH_FIRST),
+        DiggingGenerator(priority = DiggingGenerator.Priority.BREADTH_FIRST),
+        DiggingGenerator(priority = DiggingGenerator.Priority.RANDOM),
+        // LayPillarGenerator(),
+        // WallExtendGenerator(),
     )
     private val resolvers = listOf(
         RightHandResolver(),
     )
+    private val decorator: TextComposeDecorator = TextComposeDecorator()
+    private val maze = Maze(
+        decorator = decorator,
+    )
+    private val resolver = resolvers.random(Random(System.currentTimeMillis()))
+    private val player = Player(maze, resolver, decorator)
 
     init {
         viewModelScope.launch {
@@ -49,28 +52,26 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
-        val generator = generators.random(Random(System.currentTimeMillis()))
-        val resolver = resolvers.random(Random(System.currentTimeMillis()))
-        selectedGenerator.tryEmit(generator)
-        val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
-        this.mazeWidthHeight.tryEmit(mazeWidthHeight)
-        this.cells.tryEmit(
-            List(mazeWidthHeight.second) {
-                List(mazeWidthHeight.first) { null }
-            }
-        )
-        val maze = Maze(
-            width = mazeWidthHeight.first,
-            height = mazeWidthHeight.second,
-            decorator = decorator,
-        )
-        maze.setup(
-            generator = generator,
-        )
-        maze.buildMap()
-        player = Player(maze, resolver, decorator)
-        // player.start()
+    suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
+        repeat(10) {
+            val generator = generators.random(Random(System.currentTimeMillis()))
+            selectedGenerator.tryEmit(generator)
+            val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
+            cells.tryEmit(
+                List(mazeWidthHeight.second) {
+                    List(mazeWidthHeight.first) { null }
+                }
+            )
+
+            maze.setup(
+                width = mazeWidthHeight.first,
+                height = mazeWidthHeight.second,
+                generator = generator,
+            )
+            maze.buildMap()
+            // player.start()
+            delay(10000)
+        }
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {

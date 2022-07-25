@@ -8,14 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class TextComposeDecorator(
 ): Decorator {
     val procedures = MutableStateFlow<Cell?>(null)
+    val batchProcedure = MutableStateFlow<Array<Array<Cell?>>>(emptyArray())
 
     private var status: Status = Status.INIT
 
     override fun sequentialOutput(cell: Cell) {
-        procedures.tryEmit(cell)
+        when (status) {
+            Status.BUILDING -> procedures.tryEmit(cell)
+            else -> {}
+        }
     }
 
-    override fun onChangeStatus(status: Status) {
+    override fun onChangeStatus(status: Status, cells: Array<Array<Cell?>>) {
         this.status = status
     }
 }
