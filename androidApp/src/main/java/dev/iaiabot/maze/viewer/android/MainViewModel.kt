@@ -43,7 +43,7 @@ class MainViewModel: ViewModel() {
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
-                    delay(1)
+                    delay(10)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
@@ -63,13 +63,14 @@ class MainViewModel: ViewModel() {
         val maze = Maze(
             width = mazeWidthHeight.first,
             height = mazeWidthHeight.second,
-            generator = generator,
             decorator = decorator,
         )
-        maze.setup()
+        maze.setup(
+            generator = generator,
+        )
         maze.buildMap()
         player = Player(maze, resolver, decorator)
-        //player.start()
+        // player.start()
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {
