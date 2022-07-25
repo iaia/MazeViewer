@@ -46,7 +46,15 @@ class MainViewModel: ViewModel() {
                     cells[cell.y] = cells[cell.y].toMutableList().also {
                         it[cell.x] = cell
                     }
-                    delay(10)
+                    delay(2)
+                    this@MainViewModel.cells.emit(cells)
+                }
+        }
+        // TODO: proceduresとzipしてあげる必要がある
+        viewModelScope.launch {
+            decorator.batchProcedure
+                .buffer(Channel.UNLIMITED)
+                .collect { cells ->
                     this@MainViewModel.cells.emit(cells)
                 }
         }
