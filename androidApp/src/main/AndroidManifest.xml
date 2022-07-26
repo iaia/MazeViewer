@@ -3,6 +3,7 @@
     package="dev.iaiabot.maze.viewer.android">
 
     <application
+        android:label="Maze"
         android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
