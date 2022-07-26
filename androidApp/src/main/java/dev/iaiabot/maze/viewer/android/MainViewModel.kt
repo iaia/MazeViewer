@@ -7,11 +7,14 @@ import dev.iaiabot.maze.entity.Generator
 import dev.iaiabot.maze.entity.Maze
 import dev.iaiabot.maze.entity.Player
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
+import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
+import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -23,8 +26,8 @@ class MainViewModel: ViewModel() {
         DiggingGenerator(priority = DiggingGenerator.Priority.DEPTH_FIRST),
         DiggingGenerator(priority = DiggingGenerator.Priority.BREADTH_FIRST),
         DiggingGenerator(priority = DiggingGenerator.Priority.RANDOM),
-        // LayPillarGenerator(),
-        // WallExtendGenerator(),
+        LayPillarGenerator(),
+        WallExtendGenerator(),
     )
     private val resolvers = listOf(
         RightHandResolver(),
@@ -38,38 +41,37 @@ class MainViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            decorator.procedures
+            merge(decorator.procedures, decorator.batchProcedure)
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
-                    val cell = procedure ?: return@collect
-                    val cells = cells.value.toMutableList()
-                    cells[cell.y] = cells[cell.y].toMutableList().also {
-                        it[cell.x] = cell
+                    when (procedure) {
+                        is Cell -> {
+                            val cells = cells.value.toMutableList()
+                            cells[procedure.y] = cells[procedure.y].toMutableList().also {
+                                it[procedure.x] = procedure
+                            }
+                            delay(1)
+                            this@MainViewModel.cells.emit(cells)
+                        }
+                        is List<*> -> {
+                            this@MainViewModel.cells.emit(procedure as List<List<Cell?>>)
+                        }
                     }
-                    delay(2)
-                    this@MainViewModel.cells.emit(cells)
-                }
-        }
-        // TODO: proceduresとzipしてあげる必要がある
-        viewModelScope.launch {
-            decorator.batchProcedure
-                .buffer(Channel.UNLIMITED)
-                .collect { cells ->
-                    this@MainViewModel.cells.emit(cells)
                 }
         }
     }
 
     suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
+        val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
+        cells.tryEmit(
+            List(mazeWidthHeight.second) {
+                List(mazeWidthHeight.first) { null }
+            }
+        )
+
         repeat(10) {
             val generator = generators.random(Random(System.currentTimeMillis()))
             selectedGenerator.tryEmit(generator)
-            val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
-            cells.tryEmit(
-                List(mazeWidthHeight.second) {
-                    List(mazeWidthHeight.first) { null }
-                }
-            )
 
             maze.setup(
                 width = mazeWidthHeight.first,
@@ -77,7 +79,7 @@ class MainViewModel: ViewModel() {
                 generator = generator,
             )
             maze.buildMap()
-            player.start()
+            // player.start()
             delay(10000)
         }
     }

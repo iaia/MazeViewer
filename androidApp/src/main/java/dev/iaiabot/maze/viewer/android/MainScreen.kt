@@ -41,7 +41,7 @@ fun MainScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = generator?.javaClass?.simpleName.toString())
+                Text(text = generator?.name ?: "")
             }
 
             MazeCompose(
