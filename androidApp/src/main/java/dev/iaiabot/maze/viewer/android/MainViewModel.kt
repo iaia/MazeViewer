@@ -7,6 +7,7 @@ import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
 import dev.iaiabot.maze.mazeresolver.strategy.RightHandResolver
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,13 +33,14 @@ class MainViewModel: ViewModel() {
     private val decorator: TextComposeDecorator = TextComposeDecorator()
     private val maze = Maze(
         decorator = decorator,
+        dispatcher = Dispatchers.Main,
     )
     private val resolver = resolvers.random(Random(System.currentTimeMillis()))
     private val player = Player(maze, resolver, decorator)
 
     init {
         viewModelScope.launch {
-            merge(decorator.procedures, decorator.batchProcedure)
+            merge(decorator.batchProcedure, decorator.procedures)
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
                     when (procedure) {
@@ -65,19 +67,15 @@ class MainViewModel: ViewModel() {
                 List(mazeWidthHeight.first) { x -> Cell.Empty(XY(x, y)) }
             }
         )
-        repeat(10) {
-            val generator = generators.random(Random(System.currentTimeMillis()))
-            selectedGenerator.tryEmit(generator)
+        val generator = generators.random(Random(System.currentTimeMillis()))
+        selectedGenerator.tryEmit(generator)
 
-            maze.setup(
-                width = mazeWidthHeight.first,
-                height = mazeWidthHeight.second,
-                generator = generator,
-            ).join()
-            maze.buildMap().join()
-            // player.start()
-            delay(10000)
-        }
+        maze.setup(
+            width = mazeWidthHeight.first,
+            height = mazeWidthHeight.second,
+            generator = generator,
+        ).join()
+        maze.buildMap().join()
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {

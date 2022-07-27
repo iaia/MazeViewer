@@ -12,8 +12,7 @@ class TextComposeDecorator(
 
     override fun onChangeBuildStatus(status: Status, cells: Collection<Collection<Cell>>) {
         when (status) {
-            Status.FINISH_SETUP,
-            Status.FINISH_BUILD -> {
+            Status.FINISH_SETUP -> {
                 batchProcedure.tryEmit(cells.map { it.toList() })
             }
             else -> {}
