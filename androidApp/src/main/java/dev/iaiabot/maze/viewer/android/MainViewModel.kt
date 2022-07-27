@@ -2,10 +2,7 @@ package dev.iaiabot.maze.viewer.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.iaiabot.maze.entity.Cell
-import dev.iaiabot.maze.entity.Generator
-import dev.iaiabot.maze.entity.Maze
-import dev.iaiabot.maze.entity.Player
+import dev.iaiabot.maze.entity.*
 import dev.iaiabot.maze.mazegenerator.strategy.DiggingGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.LayPillarGenerator
 import dev.iaiabot.maze.mazegenerator.strategy.WallExtendGenerator
@@ -19,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainViewModel: ViewModel() {
-    val cells = MutableStateFlow<List<List<Cell?>>>(emptyList())
+    val cells = MutableStateFlow<List<List<Cell>>>(emptyList())
     val selectedGenerator = MutableStateFlow<Generator?>(null)
 
     private val generators = listOf(
@@ -54,7 +51,7 @@ class MainViewModel: ViewModel() {
                             this@MainViewModel.cells.emit(cells)
                         }
                         is List<*> -> {
-                            this@MainViewModel.cells.emit(procedure as List<List<Cell?>>)
+                            this@MainViewModel.cells.emit(procedure as List<List<Cell>>)
                         }
                     }
                 }
@@ -64,11 +61,10 @@ class MainViewModel: ViewModel() {
     suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
         val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         cells.tryEmit(
-            List(mazeWidthHeight.second) {
-                List(mazeWidthHeight.first) { null }
+            List(mazeWidthHeight.second) { y ->
+                List(mazeWidthHeight.first) { x -> Cell.Empty(XY(x, y)) }
             }
         )
-
         repeat(10) {
             val generator = generators.random(Random(System.currentTimeMillis()))
             selectedGenerator.tryEmit(generator)
@@ -77,8 +73,8 @@ class MainViewModel: ViewModel() {
                 width = mazeWidthHeight.first,
                 height = mazeWidthHeight.second,
                 generator = generator,
-            )
-            maze.buildMap()
+            ).join()
+            maze.buildMap().join()
             // player.start()
             delay(10000)
         }

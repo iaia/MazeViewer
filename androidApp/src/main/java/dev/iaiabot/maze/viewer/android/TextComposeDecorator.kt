@@ -10,25 +10,24 @@ class TextComposeDecorator(
     val procedures = MutableStateFlow<Cell?>(null)
     val batchProcedure = MutableStateFlow<List<List<Cell?>>>(emptyList())
 
-    private var status: Status = Status.INIT
-
-    override fun sequentialOutput(cell: Cell) {
+    override fun onChangeBuildStatus(status: Status, cells: Collection<Collection<Cell>>) {
         when (status) {
-            Status.BUILDING -> procedures.tryEmit(cell)
-            Status.RESOLVING -> procedures.tryEmit(cell)
-            else -> {}
-        }
-    }
-
-    override fun onChangeStatus(status: Status, cells: Array<Array<Cell?>>) {
-        this.status = status
-        when (status) {
-            Status.SETUP,
             Status.FINISH_SETUP,
             Status.FINISH_BUILD -> {
                 batchProcedure.tryEmit(cells.map { it.toList() })
             }
             else -> {}
         }
+    }
+
+    override fun onChangeResolveStatus(status: Status, cells: Collection<Cell>) {
+    }
+
+    override fun outputSequentialBuilding(cell: Cell) {
+        procedures.tryEmit(cell)
+    }
+
+    override fun outputSequentialResolving(procedures: Collection<Cell>) {
+        // procedures.tryEmit(cell)
     }
 }

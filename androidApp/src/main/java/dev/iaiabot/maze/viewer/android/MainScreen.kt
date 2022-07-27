@@ -100,7 +100,7 @@ private fun Cell(
                             )
                          */
                     }
-                    null -> Color.LightGray
+                    else -> Color.LightGray
                 }
             )
     )
