@@ -40,7 +40,7 @@ class MainViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            merge(decorator.batchProcedure, decorator.procedures)
+            merge(decorator.batchProcedure, decorator.buildProcedure)
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
                     when (procedure) {

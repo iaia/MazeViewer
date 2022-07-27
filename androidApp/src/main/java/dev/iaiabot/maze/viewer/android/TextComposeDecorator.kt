@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class TextComposeDecorator(
 ): Decorator {
-    val procedures = MutableStateFlow<Cell?>(null)
-    val batchProcedure = MutableStateFlow<List<List<Cell?>>>(emptyList())
+    val buildProcedure = MutableStateFlow<Cell?>(null)
+    val batchProcedure = MutableStateFlow<List<List<Cell>>>(emptyList())
+    val resolveProcedure = MutableStateFlow<List<Cell>>(emptyList())
 
     override fun onChangeBuildStatus(status: Status, cells: Collection<Collection<Cell>>) {
         when (status) {
@@ -20,10 +21,11 @@ class TextComposeDecorator(
     }
 
     override fun onChangeResolveStatus(status: Status, cells: Collection<Cell>) {
+        resolveProcedure.tryEmit(cells.toList())
     }
 
     override fun outputSequentialBuilding(cell: Cell) {
-        procedures.tryEmit(cell)
+        buildProcedure.tryEmit(cell)
     }
 
     override fun outputSequentialResolving(procedures: Collection<Cell>) {
