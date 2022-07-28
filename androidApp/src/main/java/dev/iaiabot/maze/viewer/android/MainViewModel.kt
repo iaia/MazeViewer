@@ -36,7 +36,13 @@ class MainViewModel: ViewModel() {
         dispatcher = Dispatchers.Main,
     )
     private val resolver = resolvers.random(Random(System.currentTimeMillis()))
-    private val player = Player(maze, resolver, decorator)
+    private val player = Player(
+        maze = maze,
+        resolver = resolver,
+        decorator = decorator,
+        dispatcher = Dispatchers.Main
+    )
+    private var mazeWidthHeight = Pair(0, 0)
 
     init {
         viewModelScope.launch {
@@ -53,10 +59,13 @@ class MainViewModel: ViewModel() {
                     when (status) {
                         Status.FINISH_SETUP -> maze.buildMap()
                         Status.FINISH_BUILD -> {
-                            delay(5000)
+                            delay(3000)
                             player.start()
                         }
-                        Status.FINISH_RESOLVE -> {}
+                        Status.FINISH_RESOLVE -> {
+                            delay(3000)
+                            start(mazeWidthHeight.first, mazeWidthHeight.second)
+                        }
                         else -> {}
                     }
                 }
@@ -71,7 +80,7 @@ class MainViewModel: ViewModel() {
                     cells[procedure.y] = cells[procedure.y].toMutableList().also {
                         it[procedure.x] = procedure
                     }
-                    delay(1)
+                    delay(2)
                     this@MainViewModel.cells.emit(cells)
                 }
         }
@@ -79,7 +88,7 @@ class MainViewModel: ViewModel() {
     }
 
     suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
-        val mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
+        mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         cells.tryEmit(
             List(mazeWidthHeight.second) { y ->
                 List(mazeWidthHeight.first) { x -> Cell.Empty(XY(x, y)) }

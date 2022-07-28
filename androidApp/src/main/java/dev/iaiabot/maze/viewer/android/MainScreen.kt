@@ -73,6 +73,11 @@ private fun MazeCompose(
     }
 }
 
+val FIRST_STEPPED_COLOR = Color(25, 200, 240)
+val SECOND_STEPPED_COLOR = Color(25, 150, 240)
+val THIRD_STEPPED_COLOR = Color(25, 100, 240)
+val GRATER_STEPPED_COLOR = Color(25, 50, 240)
+
 @Composable
 private fun Cell(
     cell: Cell?,
@@ -88,15 +93,17 @@ private fun Cell(
                     is Cell.Start, is Cell.Goal -> Color.Red
                     is Cell.Floor -> Color.Green
                     is Cell.Stepped -> {
-                        val alpha = (256 - (cell.stepped * 64)) / 256F
-
-                        Color.Blue.copy(
-                            alpha = if (alpha < 0) {
-                                0F
-                            } else {
-                                alpha
+                        if (cell.origin is Cell.Start || cell.origin is Cell.Goal) {
+                            Color.Red
+                        } else {
+                            when (cell.stepped) {
+                                0 -> Color.Green
+                                1 -> FIRST_STEPPED_COLOR
+                                2 -> SECOND_STEPPED_COLOR
+                                3 -> THIRD_STEPPED_COLOR
+                                else -> GRATER_STEPPED_COLOR
                             }
-                        )
+                        }
                     }
                     else -> Color.LightGray
                 }
