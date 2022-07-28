@@ -86,19 +86,17 @@ private fun Cell(
                 color = when (cell) {
                     is Cell.Wall -> Color.Black
                     is Cell.Start, is Cell.Goal -> Color.Red
-                    is Cell.Floor -> {
-                        Color.Green
-                        /*
-                            val alpha = (256 - (cell.stepped * 64)) / 256F
+                    is Cell.Floor -> Color.Green
+                    is Cell.Stepped -> {
+                        val alpha = (256 - (cell.stepped * 64)) / 256F
 
-                            Color.Blue.copy(
-                                alpha = if (alpha < 0) {
-                                    0F
-                                } else {
-                                    alpha
-                                }
-                            )
-                         */
+                        Color.Blue.copy(
+                            alpha = if (alpha < 0) {
+                                0F
+                            } else {
+                                alpha
+                            }
+                        )
                     }
                     else -> Color.LightGray
                 }

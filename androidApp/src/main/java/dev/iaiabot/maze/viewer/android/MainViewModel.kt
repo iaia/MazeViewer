@@ -12,6 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -40,26 +41,29 @@ class MainViewModel: ViewModel() {
     init {
         viewModelScope.launch {
             decorator.batchProcedure
-                .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
                     this@MainViewModel.cells.emit(procedure)
                 }
         }
+
         viewModelScope.launch {
-            decorator.resolveProcedure
-                .buffer(Channel.UNLIMITED)
-                .collect { procedure ->
-                    procedure ?: return@collect
-                    val cells = cells.value.toMutableList()
-                    cells[procedure.y] = cells[procedure.y].toMutableList().also {
-                        it[procedure.x] = procedure
+            decorator.status
+                .buffer(Channel.RENDEZVOUS)
+                .collect { status ->
+                    when (status) {
+                        Status.FINISH_SETUP -> maze.buildMap()
+                        Status.FINISH_BUILD -> {
+                            delay(5000)
+                            player.start()
+                        }
+                        Status.FINISH_RESOLVE -> {}
+                        else -> {}
                     }
-                    delay(1)
-                    this@MainViewModel.cells.emit(cells)
                 }
         }
+
         viewModelScope.launch {
-            decorator.buildProcedure
+            merge(decorator.buildProcedure, decorator.resolveProcedure)
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
                     procedure ?: return@collect
@@ -88,8 +92,7 @@ class MainViewModel: ViewModel() {
             width = mazeWidthHeight.first,
             height = mazeWidthHeight.second,
             generator = generator,
-        ).join()
-        maze.buildMap().join()
+        )
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {
