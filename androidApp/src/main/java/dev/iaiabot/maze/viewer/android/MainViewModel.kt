@@ -12,7 +12,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -40,24 +39,39 @@ class MainViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            merge(decorator.batchProcedure, decorator.buildProcedure)
+            decorator.batchProcedure
                 .buffer(Channel.UNLIMITED)
                 .collect { procedure ->
-                    when (procedure) {
-                        is Cell -> {
-                            val cells = cells.value.toMutableList()
-                            cells[procedure.y] = cells[procedure.y].toMutableList().also {
-                                it[procedure.x] = procedure
-                            }
-                            delay(1)
-                            this@MainViewModel.cells.emit(cells)
-                        }
-                        is List<*> -> {
-                            this@MainViewModel.cells.emit(procedure as List<List<Cell>>)
-                        }
-                    }
+                    this@MainViewModel.cells.emit(procedure)
                 }
         }
+        viewModelScope.launch {
+            decorator.resolveProcedure
+                .buffer(Channel.UNLIMITED)
+                .collect { procedure ->
+                    procedure ?: return@collect
+                    val cells = cells.value.toMutableList()
+                    cells[procedure.y] = cells[procedure.y].toMutableList().also {
+                        it[procedure.x] = procedure
+                    }
+                    delay(1)
+                    this@MainViewModel.cells.emit(cells)
+                }
+        }
+        viewModelScope.launch {
+            decorator.buildProcedure
+                .buffer(Channel.UNLIMITED)
+                .collect { procedure ->
+                    procedure ?: return@collect
+                    val cells = cells.value.toMutableList()
+                    cells[procedure.y] = cells[procedure.y].toMutableList().also {
+                        it[procedure.x] = procedure
+                    }
+                    delay(1)
+                    this@MainViewModel.cells.emit(cells)
+                }
+        }
+
     }
 
     suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {

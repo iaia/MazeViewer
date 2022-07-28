@@ -9,7 +9,7 @@ class TextComposeDecorator(
 ): Decorator {
     val buildProcedure = MutableStateFlow<Cell?>(null)
     val batchProcedure = MutableStateFlow<List<List<Cell>>>(emptyList())
-    val resolveProcedure = MutableStateFlow<List<Cell>>(emptyList())
+    val resolveProcedure = MutableStateFlow<Cell?>(null)
 
     override fun onChangeBuildStatus(status: Status, cells: Collection<Collection<Cell>>) {
         when (status) {
@@ -21,7 +21,7 @@ class TextComposeDecorator(
     }
 
     override fun onChangeResolveStatus(status: Status, cells: Collection<Cell>) {
-        resolveProcedure.tryEmit(cells.toList())
+        resolveProcedure.tryEmit(cells.last())
     }
 
     override fun outputSequentialBuilding(cell: Cell) {
