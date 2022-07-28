@@ -63,7 +63,7 @@ class MainViewModel: ViewModel() {
                             player.start()
                         }
                         Status.FINISH_RESOLVE -> {
-                            delay(3000)
+                            delay(10000)
                             start(mazeWidthHeight.first, mazeWidthHeight.second)
                         }
                         else -> {}

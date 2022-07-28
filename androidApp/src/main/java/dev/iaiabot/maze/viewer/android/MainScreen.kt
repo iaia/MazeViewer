@@ -64,7 +64,7 @@ private fun MazeCompose(
         cells.forEach { column ->
             Row {
                 column.forEach { cell ->
-                    key(cell?.x, cell?.y, cell?.javaClass) {
+                    key(cell?.x, cell?.y, cell?.javaClass, cell?.stepped) {
                         Cell(cell, cellSize)
                     }
                 }
