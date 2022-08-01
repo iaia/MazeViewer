@@ -83,7 +83,7 @@ class MainViewModel: ViewModel() {
                     cells[procedure.y] = cells[procedure.y].toMutableList().also {
                         it[procedure.x] = procedure
                     }
-                    delay(2)
+                    delay(1)
                     this@MainViewModel.cells.emit(cells)
                 }
         }

@@ -105,6 +105,7 @@ private fun Cell(
                             }
                         }
                     }
+                    is Cell.Shortest -> Color.Magenta
                     else -> Color.LightGray
                 }
             )
