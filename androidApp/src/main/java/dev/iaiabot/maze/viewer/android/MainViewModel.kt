@@ -59,7 +59,7 @@ class MainViewModel: ViewModel() {
                     when (status) {
                         Status.FINISH_SETUP -> maze.buildMap()
                         Status.FINISH_BUILD -> {
-                            delay(3000)
+                            delay(5000)
                             player.start()
                         }
                         Status.FINISH_RESOLVE -> {
@@ -87,7 +87,7 @@ class MainViewModel: ViewModel() {
 
     }
 
-    suspend fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
+    fun start(requireMazeWidth: Int, requireMazeHeight: Int) {
         mazeWidthHeight = decideMazeWidthHeight(requireMazeWidth, requireMazeHeight)
         cells.tryEmit(
             List(mazeWidthHeight.second) { y ->

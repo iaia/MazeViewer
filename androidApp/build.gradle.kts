@@ -41,21 +41,21 @@ dependencies {
     implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.appcompat:appcompat:1.4.2")
 
-    implementation("androidx.compose.ui:ui:1.1.1")
-    implementation("androidx.compose.ui:ui-tooling:1.1.1")
-    implementation("androidx.compose.foundation:foundation:1.1.1")
-    implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.material:material-icons-core:1.1.1")
-    implementation("androidx.compose.material:material-icons-extended:1.1.1")
-    implementation("androidx.activity:activity-compose:1.5.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.1.1")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.1.1")
+    implementation("androidx.compose.ui:ui:1.2.0")
+    implementation("androidx.compose.ui:ui-tooling:1.2.0")
+    implementation("androidx.compose.foundation:foundation:1.2.0")
+    implementation("androidx.compose.material:material:1.2.0")
+    implementation("androidx.compose.material:material-icons-core:1.2.0")
+    implementation("androidx.compose.material:material-icons-extended:1.2.0")
+    implementation("androidx.activity:activity-compose:1.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.2.0")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.2.0")
 
-    val maze_version = "17.0"
+    val maze_version = "19.0"
     implementation("dev.iaiabot.maze:mazeEntity:$maze_version")
     implementation("dev.iaiabot.maze:mazeGenerator:${maze_version}")
     implementation("dev.iaiabot.maze:mazeResolver:${maze_version}")
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.0")
 }
