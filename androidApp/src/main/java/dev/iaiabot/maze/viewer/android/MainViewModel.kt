@@ -63,6 +63,9 @@ class MainViewModel: ViewModel() {
                             player.start()
                         }
                         Status.FINISH_RESOLVE -> {
+                            player.findShortestPath()
+                        }
+                        Status.FINISH_FIND_SHORTEST_PATH -> {
                             delay(10000)
                             start(mazeWidthHeight.first, mazeWidthHeight.second)
                         }
@@ -84,7 +87,6 @@ class MainViewModel: ViewModel() {
                     this@MainViewModel.cells.emit(cells)
                 }
         }
-
     }
 
     fun start(requireMazeWidth: Int, requireMazeHeight: Int) {

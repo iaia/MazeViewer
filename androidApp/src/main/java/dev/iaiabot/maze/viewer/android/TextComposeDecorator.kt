@@ -28,7 +28,8 @@ class TextComposeDecorator(
     override fun onChangeResolveStatus(status: Status, cells: Collection<Cell>) {
         onChangeStatus(status)
         when (status) {
-            Status.FINISH_RESOLVE -> this.status.tryEmit(status)
+            Status.FINISH_RESOLVE,
+            Status.FINISH_FIND_SHORTEST_PATH -> this.status.tryEmit(status)
             else -> {}
         }
     }
