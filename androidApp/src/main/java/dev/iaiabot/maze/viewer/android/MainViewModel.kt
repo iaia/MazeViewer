@@ -59,14 +59,15 @@ class MainViewModel: ViewModel() {
                     when (status) {
                         Status.FINISH_SETUP -> maze.buildMap()
                         Status.FINISH_BUILD -> {
-                            delay(5000)
+                            delay(3000)
                             player.start()
                         }
                         Status.FINISH_RESOLVE -> {
+                            delay(3000)
                             player.findShortestPath()
                         }
                         Status.FINISH_FIND_SHORTEST_PATH -> {
-                            delay(10000)
+                            delay(5000)
                             start(mazeWidthHeight.first, mazeWidthHeight.second)
                         }
                         else -> {}
