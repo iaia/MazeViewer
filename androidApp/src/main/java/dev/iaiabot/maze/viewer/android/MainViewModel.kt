@@ -30,7 +30,7 @@ class MainViewModel: ViewModel() {
     private val resolvers = listOf(
         RightHandResolver(),
     )
-    private val decorator: TextComposeDecorator = TextComposeDecorator()
+    private val decorator: MazeCallback = MazeCallback()
     private val maze = Maze(
         decorator = decorator,
         dispatcher = Dispatchers.Main,

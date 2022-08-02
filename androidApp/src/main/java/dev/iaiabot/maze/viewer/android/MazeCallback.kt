@@ -5,8 +5,8 @@ import dev.iaiabot.maze.entity.Status
 import dev.iaiabot.maze.entity.decorator.Decorator
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class TextComposeDecorator(
-): Decorator {
+class MazeCallback(
+) : Decorator {
     val buildProcedure = MutableStateFlow<Cell?>(null)
     val batchProcedure = MutableStateFlow<List<List<Cell>>>(emptyList())
     val resolveProcedure = MutableStateFlow<Cell?>(null)
