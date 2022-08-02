@@ -22,9 +22,16 @@ fun MainScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val cellSize = 18
+    val wallSize = 8
 
-    val requireMazeWidth = (LocalConfiguration.current.screenWidthDp - 4) / cellSize
-    val requireMazeHeight = (LocalConfiguration.current.screenHeightDp - (4 + 18)) / cellSize
+    val mazeAreaWidth = (LocalConfiguration.current.screenWidthDp - 4)
+    val mazeAreaHeight = (LocalConfiguration.current.screenHeightDp - (4 + 18))
+
+    val widthN = mazeAreaWidth / (cellSize + wallSize)
+    val heightN = mazeAreaHeight / (cellSize + wallSize)
+
+    val requireMazeWidth = 2 * widthN + 1
+    val requireMazeHeight = 2 * heightN + 1
 
     val cells by viewModel.cells.collectAsState()
     val generator by viewModel.selectedGenerator.collectAsState()
@@ -64,6 +71,7 @@ fun MainScreen(
 
             MazeCompose(
                 cellSize = cellSize.dp,
+                wallSize = wallSize.dp,
                 cells = cells,
             )
         }
@@ -73,17 +81,28 @@ fun MainScreen(
 @Composable
 private fun MazeCompose(
     cellSize: Dp,
+    wallSize: Dp,
     cells: List<List<Cell?>>,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        cells.forEach { column ->
+        cells.forEachIndexed { rIndex, column ->
             Row {
-                column.forEach { cell ->
+                column.forEachIndexed { cIndex, cell ->
                     key(cell?.x, cell?.y, cell?.javaClass, cell?.stepped) {
-                        Cell(cell, cellSize)
+                        Cell(
+                            cell = cell,
+                            cellSize = cellSize,
+                            wallSize = wallSize,
+                            cellVisibleType = when {
+                                rIndex % 2 == 0 && cIndex % 2 == 0 -> CellVisibleType.SMALL_WALL
+                                rIndex % 2 == 0 -> CellVisibleType.LANDSCAPE_WALL
+                                cIndex % 2 == 0 -> CellVisibleType.PORTRAIT_WALL
+                                else -> CellVisibleType.FLOOR
+                            }
+                        )
                     }
                 }
             }
@@ -96,15 +115,38 @@ val SECOND_STEPPED_COLOR = Color(25, 150, 240)
 val THIRD_STEPPED_COLOR = Color(25, 100, 240)
 val GRATER_STEPPED_COLOR = Color(25, 50, 240)
 
+enum class CellVisibleType {
+    FLOOR,
+    PORTRAIT_WALL,
+    LANDSCAPE_WALL,
+    SMALL_WALL,
+}
+
 @Composable
 private fun Cell(
     cell: Cell?,
     cellSize: Dp,
+    wallSize: Dp,
+    cellVisibleType: CellVisibleType
 ) {
     Box(
         modifier = Modifier
-            .size(cellSize)
-            .padding(1.dp)
+            .width(
+                when (cellVisibleType) {
+                    CellVisibleType.FLOOR -> cellSize
+                    CellVisibleType.PORTRAIT_WALL -> wallSize
+                    CellVisibleType.LANDSCAPE_WALL -> cellSize
+                    CellVisibleType.SMALL_WALL -> wallSize
+                }
+            )
+            .height(
+                when (cellVisibleType) {
+                    CellVisibleType.FLOOR -> cellSize
+                    CellVisibleType.PORTRAIT_WALL -> cellSize
+                    CellVisibleType.LANDSCAPE_WALL -> wallSize
+                    CellVisibleType.SMALL_WALL -> wallSize
+                }
+            )
             .background(
                 color = when (cell) {
                     is Cell.Wall -> Color.Black
