@@ -8,13 +8,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import dev.iaiabot.maze.entity.Cell
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val cellSize = 18
 
@@ -24,8 +29,21 @@ fun MainScreen(
     val cells by viewModel.cells.collectAsState()
     val generator by viewModel.selectedGenerator.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.start(requireMazeWidth, requireMazeHeight)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.start(requireMazeWidth, requireMazeHeight)
+                }
+                else -> {}
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     BoxWithConstraints(
