@@ -45,6 +45,12 @@ class MainViewModel: ViewModel() {
     private var mazeWidthHeight = Pair(0, 0)
     private var stop = false
     private var status: Status = Status.INIT
+        set(value) {
+            field = value
+            viewModelScope.launch {
+                onChangeStatus()
+            }
+        }
 
     init {
         viewModelScope.launch {
@@ -59,7 +65,6 @@ class MainViewModel: ViewModel() {
                 .buffer(Channel.RENDEZVOUS)
                 .collect { status ->
                     this@MainViewModel.status = status
-                    onChangeStatus()
                 }
         }
 
