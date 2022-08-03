@@ -43,6 +43,8 @@ class MainViewModel: ViewModel() {
         dispatcher = Dispatchers.Main
     )
     private var mazeWidthHeight = Pair(0, 0)
+    private var stop = false
+    private var status: Status = Status.INIT
 
     init {
         viewModelScope.launch {
@@ -56,22 +58,8 @@ class MainViewModel: ViewModel() {
             decorator.status
                 .buffer(Channel.RENDEZVOUS)
                 .collect { status ->
-                    when (status) {
-                        Status.FINISH_SETUP -> maze.buildMap()
-                        Status.FINISH_BUILD -> {
-                            delay(3000)
-                            player.start()
-                        }
-                        Status.FINISH_RESOLVE -> {
-                            delay(3000)
-                            player.findShortestPath()
-                        }
-                        Status.FINISH_FIND_SHORTEST_PATH -> {
-                            delay(5000)
-                            start(mazeWidthHeight.first, mazeWidthHeight.second)
-                        }
-                        else -> {}
-                    }
+                    this@MainViewModel.status = status
+                    onChangeStatus()
                 }
         }
 
@@ -105,6 +93,41 @@ class MainViewModel: ViewModel() {
             height = mazeWidthHeight.second,
             generator = generator,
         )
+    }
+
+    fun onClick() {
+        stop = !stop
+
+        if (!stop) {
+            viewModelScope.launch {
+                onChangeStatus()
+            }
+        }
+    }
+
+    private suspend fun onChangeStatus() {
+        when (status) {
+            Status.FINISH_SETUP -> maze.buildMap()
+            Status.FINISH_BUILD -> {
+                delay(3000)
+                if (!stop) {
+                    player.start()
+                }
+            }
+            Status.FINISH_RESOLVE -> {
+                delay(3000)
+                if (!stop) {
+                    player.findShortestPath()
+                }
+            }
+            Status.FINISH_FIND_SHORTEST_PATH -> {
+                delay(5000)
+                if (!stop) {
+                    start(mazeWidthHeight.first, mazeWidthHeight.second)
+                }
+            }
+            else -> {}
+        }
     }
 
     private fun decideMazeWidthHeight(mazeWidth: Int, mazeHeight: Int): Pair<Int, Int> {
