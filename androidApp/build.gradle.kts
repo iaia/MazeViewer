@@ -14,12 +14,23 @@ android {
         versionName = "1.1"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile =
+                file("${projectDir}/debug_key_store")
+            storePassword = "debug_key"
+            keyAlias = "debug_key"
+            keyPassword = "debug_key"
+        }
+    }
+
     buildTypes {
         debug {
             isDebuggable = true
         }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -39,7 +50,7 @@ android {
 dependencies {
     implementation(project(":shared"))
     implementation("com.google.android.material:material:1.6.1")
-    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.appcompat:appcompat:1.5.0")
 
     implementation("androidx.compose.ui:ui:1.2.0")
     implementation("androidx.compose.ui:ui-tooling:1.2.0")
